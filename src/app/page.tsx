@@ -1,68 +1,102 @@
-import Image from "next/image";
+import { isAuthenticated } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
+import { createPost } from './actions';
+import { Heart, Image as ImageIcon, Video, Sparkles } from 'lucide-react';
 
-export default function Home() {
+export default async function HomePage() {
+  const auth = await isAuthenticated();
+  if (!auth) redirect('/login');
+
+  const posts = await prisma.post.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-slate-50 text-slate-800">
+      <header className="bg-white/70 backdrop-blur-md sticky top-0 z-10 border-b border-pink-100">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="text-pink-500" />
+            <h1 className="text-2xl font-black bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+              Kurocki News
+            </h1>
+          </div>
+          <span className="text-sm font-medium bg-pink-100 text-pink-700 px-3 py-1 rounded-full flex items-center gap-1">
+            С Днём Рождения, Ксюша! <Heart className="w-4 h-4 fill-pink-500 text-pink-500" />
+          </span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Форма создания новости */}
+        <section className="bg-white p-6 rounded-2xl shadow-sm border border-pink-100 space-y-4">
+          <h2 className="text-xl font-bold text-slate-700">Опубликовать новость</h2>
+          <form action={createPost} className="space-y-4">
+            <input
+              name="title"
+              placeholder="Заголовок новости..."
+              required
+              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+            <textarea
+              name="content"
+              placeholder="Текст новости..."
+              rows={3}
+              required
+              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                name="imageUrl"
+                placeholder="Ссылка на фото (URL)"
+                className="p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-sm"
+              />
+              <input
+                name="videoUrl"
+                placeholder="Ссылка на видео (YouTube / MP4 URL)"
+                className="p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition"
+            >
+              Опубликовать
+            </button>
+          </form>
+        </section>
+
+        {/* Лента новостей */}
+        <section className="space-y-6">
+          {posts.map((post) => (
+            <article key={post.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+              {post.imageUrl && (
+                <img src={post.imageUrl} alt={post.title} className="w-full max-h-96 object-cover" />
+              )}
+              {post.videoUrl && (
+                <div className="aspect-video w-full">
+                  {post.videoUrl.includes('youtube') ? (
+                    <iframe
+                      src={post.videoUrl.replace('watch?v=', 'embed/')}
+                      className="w-full h-full"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video src={post.videoUrl} controls className="w-full h-full object-cover" />
+                  )}
+                </div>
+              )}
+              <div className="p-6 space-y-2">
+                <span className="text-xs text-slate-400">
+                  {new Date(post.createdAt).toLocaleDateString('ru-RU')}
+                </span>
+                <h3 className="text-2xl font-bold text-slate-800">{post.title}</h3>
+                <p className="text-slate-600 whitespace-pre-line">{post.content}</p>
+              </div>
+            </article>
+          ))}
+        </section>
       </main>
     </div>
   );
