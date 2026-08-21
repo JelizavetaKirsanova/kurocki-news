@@ -1,38 +1,115 @@
-import { login } from '@/lib/auth';
-import { redirect } from 'next/navigation';
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ShieldAlert, Terminal, Lock, KeyRound, AlertTriangle } from 'lucide-react';
 
 export default function LoginPage() {
-  async function handleLogin(formData: FormData) {
-    'use server'
-    const loginStr = formData.get('login') as string;
-    const passStr = formData.get('password') as string;
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-    const success = await login(loginStr, passStr);
-    if (success) {
-      redirect('/');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(false);
+
+    // Запрос к вашему API авторизации
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+
+    if (res.ok) {
+      router.push('/');
+      router.refresh();
     } else {
-      redirect('/login?error=1');
+      setError(true);
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md border border-white">
-        <h1 className="text-3xl font-extrabold text-center text-pink-600 mb-2">Kurocki News 💖</h1>
-        <p className="text-center text-gray-500 mb-6">Спецвыпуск для Ксюши!</p>
-        <form action={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Логин</label>
-            <input name="login" type="text" required className="mt-1 w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-400 outline-none" />
+    <div className="min-h-screen bg-stone-950 text-red-500 font-mono flex items-center justify-center p-4 selection:bg-red-900 selection:text-white relative overflow-hidden">
+      {/* Эффект сетки и сканирования */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f0909_1px,transparent_1px),linear-gradient(to_bottom,#1f0909_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
+      
+      {/* Виньетка и фоновый градиент тревоги */}
+      <div className="absolute inset-0 bg-radial from-red-950/20 via-black to-black pointer-events-none" />
+
+      <div className="w-full max-w-md bg-stone-900/90 border-2 border-red-900/80 rounded-xl p-6 md:p-8 shadow-[0_0_50px_rgba(153,27,27,0.25)] relative z-10 backdrop-blur-md">
+        
+        {/* Шапка терминала */}
+        <div className="flex items-center justify-between border-b border-red-900/50 pb-4 mb-6">
+          <div className="flex items-center gap-2 text-red-500 text-xs font-bold tracking-widest uppercase">
+            <Terminal className="w-4 h-4 animate-pulse" />
+            <span>CONFIDENTIAL_DB // V4.08</span>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Пароль</label>
-            <input name="password" type="password" required className="mt-1 w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-400 outline-none" />
+          <div className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping" />
+            <span className="text-[10px] text-red-700 font-bold tracking-wider uppercase">RESTRICTED</span>
           </div>
-          <button type="submit" className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl transition-all shadow-md hover:shadow-lg">
-            Войти
+        </div>
+
+        {/* Предупреждающий баннер */}
+        <div className="bg-red-950/40 border border-red-800/60 rounded-lg p-3.5 mb-6 flex items-start gap-3">
+          <ShieldAlert className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+          <div className="text-xs space-y-1">
+            <p className="font-bold text-red-400 uppercase tracking-wider">ВНИМАНИЕ: ДОСТУП ОГРАНИЧЕН</p>
+            <p className="text-red-300/70 leading-relaxed">
+              Данный терминал содержит зашифрованные материалы следствия. Все IP-адреса фиксируются. Попытки взлома преследуются по закону.
+            </p>
+          </div>
+        </div>
+
+        {/* Форма ввода ключа */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-widest text-stone-400 flex items-center gap-2">
+              <KeyRound className="w-3.5 h-3.5 text-red-500" />
+              Введите ключ доступа:
+            </label>
+            <div className="relative">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••••••"
+                required
+                className="w-full bg-black/80 border border-red-900/80 rounded-lg px-4 py-3 text-red-400 placeholder-stone-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 font-mono text-sm transition tracking-widest"
+              />
+              <Lock className="w-4 h-4 text-stone-600 absolute right-3.5 top-3.5" />
+            </div>
+          </div>
+
+          {error && (
+            <div className="flex items-center gap-2 text-xs text-red-400 bg-red-950/80 border border-red-800 p-2.5 rounded-lg animate-shake">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+              <span>ОШИБКА АВТОРИЗАЦИИ: Неверный ключ доступа. Попытка зафиксирована.</span>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 font-bold text-xs uppercase tracking-widest py-3 px-4 rounded-lg transition-all shadow-[0_0_15px_rgba(153,27,27,0.4)] hover:shadow-[0_0_25px_rgba(225,29,225,0.6)] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+          >
+            {isLoading ? (
+              <span>РАСШИФРОВКА КЛЮЧА...</span>
+            ) : (
+              <span>ПОДТВЕРДИТЬ ЛИЧНОСТЬ</span>
+            )}
           </button>
         </form>
+
+        {/* Футер терминала */}
+        <div className="mt-8 pt-4 border-t border-red-900/30 text-center">
+          <p className="text-[10px] text-stone-600 tracking-widest uppercase">
+            STATUS: SURVEILLANCE ACTIVE // CASE #2026-KS
+          </p>
+        </div>
       </div>
     </div>
   );
