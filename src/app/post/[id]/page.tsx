@@ -15,8 +15,9 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   if (!post) notFound();
 
   return (
-    <article className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans py-12 px-4 selection:bg-pink-200 selection:text-pink-900">
-      <div className="max-w-3xl mx-auto space-y-10 bg-white p-8 md:p-14 rounded-3xl border border-stone-200/80 shadow-[0_10px_40px_rgba(0,0,0,0.04)]">
+    <article className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans py-8 md:py-16 px-4 md:px-8 selection:bg-pink-200 selection:text-pink-900">
+      {/* Увеличена ширина с max-w-3xl до max-w-5xl */}
+      <div className="max-w-5xl mx-auto space-y-10 bg-white p-6 md:p-16 rounded-3xl border border-stone-200/80 shadow-[0_10px_40px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between border-b border-stone-100 pb-6">
           <Link href="/" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-stone-400 hover:text-stone-900 transition">
             <ArrowLeft className="w-4 h-4" /> Главная лента

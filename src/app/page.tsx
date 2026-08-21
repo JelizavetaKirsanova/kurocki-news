@@ -29,7 +29,7 @@ export default async function HomePage() {
             </div>
             <div>
               <h1 className="text-2xl md:text-3xl font-black font-serif tracking-tight text-stone-900">
-                Kurocki <span className="text-pink-600 italic font-normal">News</span>
+                Kurochki <span className="text-pink-600 italic font-normal">News</span>
               </h1>
               <p className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">Special Edition</p>
             </div>
