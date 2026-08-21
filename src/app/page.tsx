@@ -2,7 +2,7 @@ import { isAuthenticated, isAdmin } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { deletePost, logout } from './actions';
-import { Heart, Sparkles, Trash2, Edit3, ArrowRight, Plus, LogOut } from 'lucide-react';
+import { Heart, Sparkles, Trash2, Edit3, ArrowRight, Plus, LogOut, Calendar } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function HomePage() {
@@ -11,6 +11,7 @@ export default async function HomePage() {
 
   const adminAccess = await isAdmin();
 
+  // Новости сортируются по выбранной дате публикации (от самых новых к старым)
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: 'desc' },
   });
@@ -36,7 +37,7 @@ export default async function HomePage() {
               С Днём Рождения, Ксюша! <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500" />
             </span>
 
-            {/* Кнопка выхода из аккаунта */}
+            {/* Кнопка выхода */}
             <form action={logout}>
               <button
                 type="submit"
@@ -51,7 +52,7 @@ export default async function HomePage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-10 space-y-8">
-        {/* Лента новостей в виде карточек */}
+        {/* Лента отсортированных новостей */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {posts.map((post: any) => (
             <article key={post.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between">
@@ -60,9 +61,16 @@ export default async function HomePage() {
                   <img src={post.imageUrl} alt={post.title} className="w-full h-48 object-cover" />
                 )}
                 <div className="p-6 space-y-2">
-                  <span className="text-xs text-slate-400">
-                    {new Date(post.createdAt).toLocaleDateString('ru-RU')}
-                  </span>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>
+                      {new Date(post.createdAt).toLocaleDateString('ru-RU', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </div>
                   <h3 className="text-2xl font-serif font-bold text-slate-900 leading-snug">{post.title}</h3>
                   {post.subtitle && (
                     <p className="text-slate-600 line-clamp-2 text-sm">{post.subtitle}</p>
@@ -75,7 +83,7 @@ export default async function HomePage() {
                   Читать полностью <ArrowRight className="w-4 h-4" />
                 </Link>
 
-                {/* Управление новостью только для Администратора */}
+                {/* Кнопки управления админа */}
                 {adminAccess && (
                   <div className="flex items-center gap-2">
                     <Link href={`/edit/${post.id}`} className="p-2 text-slate-500 hover:text-slate-800 transition">
