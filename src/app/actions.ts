@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { isAuthenticated } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 export async function createPost(formData: FormData) {
   const isAuth = await isAuthenticated();
@@ -14,6 +15,9 @@ export async function createPost(formData: FormData) {
   const content = formData.get('content') as string;
   const imageUrl = formData.get('imageUrl') as string;
   const videoUrl = formData.get('videoUrl') as string;
+  const createdAtInput = formData.get('createdAt') as string;
+
+  const createdAt = createdAtInput ? new Date(createdAtInput) : new Date();
 
   const slug = title
     .toLowerCase()
@@ -29,10 +33,12 @@ export async function createPost(formData: FormData) {
       content,
       imageUrl: imageUrl || null,
       videoUrl: videoUrl || null,
+      createdAt,
     },
   });
 
   revalidatePath('/');
+  redirect('/');
 }
 
 export async function deletePost(formData: FormData) {
@@ -56,6 +62,9 @@ export async function updatePost(formData: FormData) {
   const content = formData.get('content') as string;
   const imageUrl = formData.get('imageUrl') as string;
   const videoUrl = formData.get('videoUrl') as string;
+  const createdAtInput = formData.get('createdAt') as string;
+
+  const createdAt = createdAtInput ? new Date(createdAtInput) : new Date();
 
   await prisma.post.update({
     where: { id },
@@ -65,6 +74,7 @@ export async function updatePost(formData: FormData) {
       content,
       imageUrl: imageUrl || null,
       videoUrl: videoUrl || null,
+      createdAt,
     },
   });
 
@@ -72,10 +82,8 @@ export async function updatePost(formData: FormData) {
   revalidatePath(`/post/${id}`);
   redirect(`/post/${id}`);
 }
-import { cookies } from 'next/headers';
 
 export async function logout() {
-  'use server'
   const cookieStore = await cookies();
   cookieStore.delete('user_role');
   redirect('/login');
