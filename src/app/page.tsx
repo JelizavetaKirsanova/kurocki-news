@@ -2,7 +2,7 @@ import { isAuthenticated } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { createPost } from './actions';
-import { Heart, Image as ImageIcon, Video, Sparkles } from 'lucide-react';
+import { Heart, Sparkles } from 'lucide-react';
 
 export default async function HomePage() {
   const auth = await isAuthenticated();
@@ -37,12 +37,17 @@ export default async function HomePage() {
               name="title"
               placeholder="Заголовок новости..."
               required
-              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none"
+              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none font-semibold text-lg"
+            />
+            <input
+              name="subtitle"
+              placeholder="Подзаголовок (необязательно)..."
+              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-slate-600"
             />
             <textarea
               name="content"
               placeholder="Текст новости..."
-              rows={3}
+              rows={4}
               required
               className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none"
             />
@@ -92,7 +97,10 @@ export default async function HomePage() {
                   {new Date(post.createdAt).toLocaleDateString('ru-RU')}
                 </span>
                 <h3 className="text-2xl font-bold text-slate-800">{post.title}</h3>
-                <p className="text-slate-600 whitespace-pre-line">{post.content}</p>
+                {post.subtitle && (
+                  <h4 className="text-lg font-medium text-pink-600 italic">{post.subtitle}</h4>
+                )}
+                <p className="text-slate-600 whitespace-pre-line pt-2">{post.content}</p>
               </div>
             </article>
           ))}

@@ -9,6 +9,7 @@ generator client {
 model Post {
   id        String   @id @default(cuid())
   title     String
+  subtitle  String?
   content   String
   imageUrl  String?
   videoUrl  String?
