@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { deletePost, logout } from './actions';
 import { Heart, Sparkles, Trash2, Edit3, ArrowRight, Plus, LogOut, Calendar, Newspaper } from 'lucide-react';
 import Link from 'next/link';
+import BirthdayButton from './components/BirthdayButton';
 
 export default async function HomePage() {
   const auth = await isAuthenticated();
@@ -44,7 +45,8 @@ export default async function HomePage() {
               </Link>
             )}
             <span className="hidden sm:flex text-xs font-medium bg-pink-50 text-pink-700 border border-pink-200/60 px-3.5 py-1.5 rounded-full items-center gap-1.5 shadow-sm">
-              С Днём Рождения, Ксюша! <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500 animate-pulse" />
+              <Heart className="w-3.5 h-3.5 text-pink-500" />
+              <BirthdayButton />
             </span>
 
             <form action={logout}>
