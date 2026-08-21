@@ -72,3 +72,11 @@ export async function updatePost(formData: FormData) {
   revalidatePath(`/post/${id}`);
   redirect(`/post/${id}`);
 }
+import { cookies } from 'next/headers';
+
+export async function logout() {
+  'use server'
+  const cookieStore = await cookies();
+  cookieStore.delete('user_role');
+  redirect('/login');
+}
