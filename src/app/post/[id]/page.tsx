@@ -14,10 +14,10 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
 
   if (!post) notFound();
 
-  // Кастомный рендерер медиафайлов
-  const MarkdownComponents = {
-    img: ({ src, alt }: { src?: string; alt?: string }) => {
-      if (!src) return null;
+  // Кастомный рендерер медиафайлов с поддержкой всех типов ReactMarkdown
+  const MarkdownComponents: any = {
+    img: ({ src, alt }: { src?: any; alt?: string }) => {
+      if (!src || typeof src !== 'string') return null;
 
       const isGoogleDriveVideo = src.includes('drive.google.com') && (src.includes('/preview') || src.includes('/view'));
       const isYouTube = src.includes('youtube.com') || src.includes('youtu.be');
