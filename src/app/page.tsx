@@ -44,10 +44,7 @@ export default async function HomePage() {
                 <Plus className="w-4 h-4 text-pink-400" /> Написать статью
               </Link>
             )}
-            <span className="hidden sm:flex text-xs font-medium bg-pink-50 text-pink-700 border border-pink-200/60 px-3.5 py-1.5 rounded-full items-center gap-1.5 shadow-sm">
-              <Heart className="w-3.5 h-3.5 text-pink-500" />
-              <BirthdayButton />
-            </span>
+            <BirthdayButton />
 
             <form action={logout}>
               <button
