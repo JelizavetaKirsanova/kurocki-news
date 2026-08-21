@@ -14,7 +14,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
 
   if (!post) notFound();
 
-  // Кастомный рендерер медиафайлов с поддержкой всех типов ReactMarkdown
+  // Кастомный рендерер медиафайлов и элементов с исправленным типом для TypeScript
   const MarkdownComponents: any = {
     img: ({ src, alt }: { src?: any; alt?: string }) => {
       if (!src || typeof src !== 'string') return null;
@@ -51,7 +51,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
           <div className="my-8 aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-slate-200">
             <iframe
               src={embedUrl}
-              className="w-full h-full"
+              className="w-full h-full border-0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
@@ -59,7 +59,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         );
       }
 
-      // 3. Прямой видеофайл (MP4)
+      // 3. Прямой видеофайл (MP4, MOV)
       if (isDirectVideo) {
         return (
           <div className="my-8 aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-slate-200 bg-black">
@@ -68,7 +68,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         );
       }
 
-      // 4. Обычное изображение с отступами
+      // 4. Обычная картинка с отступами
       return (
         <figure className="my-8 space-y-2">
           <img
@@ -112,12 +112,12 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
           </p>
         </div>
 
-        {/* Обложка статьи (фото) */}
+        {/* Главная фото-обложка статьи */}
         {post.imageUrl && (
           <img src={post.imageUrl} alt={post.title} className="w-full max-h-[480px] object-cover rounded-2xl my-6" />
         )}
 
-        {/* Видео-обложка (Google Диск или YouTube) */}
+        {/* Главная видео-обложка статьи */}
         {post.videoUrl && (
           <div className="my-6 aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-slate-200 bg-black">
             {post.videoUrl.includes('drive.google.com') ? (
@@ -139,7 +139,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
           </div>
         )}
 
-        {/* Основной текст статьи */}
+        {/* Основной текст новости */}
         <div className="prose prose-slate max-w-none text-slate-800 text-lg">
           <ReactMarkdown components={MarkdownComponents}>{post.content}</ReactMarkdown>
         </div>
