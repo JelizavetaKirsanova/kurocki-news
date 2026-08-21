@@ -69,7 +69,7 @@ export default async function HomePage() {
 
         {/* Лента новостей */}
         <section className="space-y-6">
-          {posts.map((post) => (
+          {posts.map((post: any) => (
             <article key={post.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
               {post.imageUrl && (
                 <img src={post.imageUrl} alt={post.title} className="w-full max-h-96 object-cover" />
