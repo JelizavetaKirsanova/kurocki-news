@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { createPost } from './actions';
 import { Heart, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 export default async function HomePage() {
   const auth = await isAuthenticated();
@@ -13,74 +14,103 @@ export default async function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800">
-      <header className="bg-white/70 backdrop-blur-md sticky top-0 z-10 border-b border-pink-100">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#FAF9F6] text-slate-900 font-sans">
+      <header className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-slate-200">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="text-pink-500" />
-            <h1 className="text-2xl font-black bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-black font-serif tracking-tight">
               Kurocki News
             </h1>
           </div>
-          <span className="text-sm font-medium bg-pink-100 text-pink-700 px-3 py-1 rounded-full flex items-center gap-1">
-            С Днём Рождения, Ксюша! <Heart className="w-4 h-4 fill-pink-500 text-pink-500" />
+          <span className="text-xs font-medium bg-pink-100 text-pink-700 px-3 py-1 rounded-full flex items-center gap-1">
+            С Днём Рождения, Ксюша! <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500" />
           </span>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Форма создания новости */}
-        <section className="bg-white p-6 rounded-2xl shadow-sm border border-pink-100 space-y-4">
-          <h2 className="text-xl font-bold text-slate-700">Опубликовать новость</h2>
+      <main className="max-w-3xl mx-auto px-4 py-10 space-y-12">
+        {/* Редактор создания статьи */}
+        <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <h2 className="text-xl font-serif font-bold text-slate-800">Редактор спецвыпуска</h2>
           <form action={createPost} className="space-y-4">
             <input
               name="title"
-              placeholder="Заголовок новости..."
+              placeholder="Главный заголовок статьи..."
               required
-              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none font-semibold text-lg"
+              className="w-full p-3 text-2xl font-serif font-bold border-b border-slate-200 outline-none focus:border-slate-800 transition placeholder:font-sans placeholder:text-lg placeholder:font-normal"
             />
             <input
               name="subtitle"
-              placeholder="Подзаголовок (необязательно)..."
-              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-slate-600"
+              placeholder="Вводный анонс / лид статьи..."
+              className="w-full p-2 text-base text-slate-600 outline-none border-b border-slate-100 focus:border-slate-400 transition"
             />
-            <textarea
-              name="content"
-              placeholder="Текст новости..."
-              rows={4}
-              required
-              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none"
-            />
+            
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Текст статьи (поддерживает абзацы и # подзаголовки)
+              </label>
+              <textarea
+                name="content"
+                placeholder="Пишите текст статьи здесь. Добавляйте подзаголовки со значком # в начале строки..."
+                rows={8}
+                required
+                className="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-slate-300 transition text-base leading-relaxed"
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 name="imageUrl"
-                placeholder="Ссылка на фото (URL)"
-                className="p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-sm"
+                placeholder="Ссылка на обложку (URL photo)"
+                className="p-3 border rounded-xl outline-none text-sm focus:ring-1 focus:ring-slate-400"
               />
               <input
                 name="videoUrl"
-                placeholder="Ссылка на видео (YouTube / MP4 URL)"
-                className="p-3 border rounded-xl focus:ring-2 focus:ring-pink-300 outline-none text-sm"
+                placeholder="Ссылка на видео (YouTube URL)"
+                className="p-3 border rounded-xl outline-none text-sm focus:ring-1 focus:ring-slate-400"
               />
             </div>
+
             <button
               type="submit"
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3.5 rounded-xl transition shadow-md"
             >
-              Опубликовать
+              Опубликовать в спецвыпуск
             </button>
           </form>
         </section>
 
-        {/* Лента новостей */}
-        <section className="space-y-6">
+        {/* Журнальная лента */}
+        <section className="space-y-16">
           {posts.map((post: any) => (
-            <article key={post.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <article key={post.id} className="bg-white p-6 md:p-10 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
+              {/* Шапка статьи */}
+              <div className="space-y-3 border-b border-slate-100 pb-6">
+                <h2 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 leading-tight">
+                  {post.title}
+                </h2>
+                {post.subtitle && (
+                  <p className="text-lg md:text-xl text-slate-600 font-light leading-relaxed">
+                    {post.subtitle}
+                  </p>
+                )}
+                <div className="flex items-center gap-4 text-xs text-slate-400 pt-2">
+                  <span>{new Date(post.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  <span>•</span>
+                  <span>СПЕЦВЫПУСК</span>
+                </div>
+              </div>
+
+              {/* Медиа-обложка */}
               {post.imageUrl && (
-                <img src={post.imageUrl} alt={post.title} className="w-full max-h-96 object-cover" />
+                <div className="rounded-xl overflow-hidden my-4">
+                  <img src={post.imageUrl} alt={post.title} className="w-full max-h-[480px] object-cover" />
+                </div>
               )}
+
               {post.videoUrl && (
-                <div className="aspect-video w-full">
+                <div className="aspect-video w-full rounded-xl overflow-hidden">
                   {post.videoUrl.includes('youtube') ? (
                     <iframe
                       src={post.videoUrl.replace('watch?v=', 'embed/')}
@@ -92,15 +122,10 @@ export default async function HomePage() {
                   )}
                 </div>
               )}
-              <div className="p-6 space-y-2">
-                <span className="text-xs text-slate-400">
-                  {new Date(post.createdAt).toLocaleDateString('ru-RU')}
-                </span>
-                <h3 className="text-2xl font-bold text-slate-800">{post.title}</h3>
-                {post.subtitle && (
-                  <h4 className="text-lg font-medium text-pink-600 italic">{post.subtitle}</h4>
-                )}
-                <p className="text-slate-600 whitespace-pre-line pt-2">{post.content}</p>
+
+              {/* Основное тело статьи */}
+              <div className="prose prose-slate max-w-none text-slate-800 text-lg leading-relaxed space-y-4">
+                <ReactMarkdown>{post.content}</ReactMarkdown>
               </div>
             </article>
           ))}
